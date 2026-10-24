@@ -1,3 +1,4 @@
+# fork: activated workflows (pushing a workflow change registers them on forks)
 name: Build and Push to GHCR & ACR
 # 此工作流仅在推送标签 (v*) 时触发，用于构建和推送 Docker 镜像
 
