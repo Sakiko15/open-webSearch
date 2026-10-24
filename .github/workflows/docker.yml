@@ -104,7 +104,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64,linux/arm64  # 🎯 这里添加了多平台支持
+          # amd64 only: arm64 under QEMU emulation crashes in npm install
+          # with SIGILL (exit 132). Switch to linux/arm64 if targeting an ARM host.
+          platforms: linux/amd64
           push: true
           provenance: false
           tags: ${{ steps.tags.outputs.tags }}
