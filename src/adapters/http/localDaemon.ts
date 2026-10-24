@@ -6,6 +6,7 @@ import { createErrorEnvelope, createSuccessEnvelope } from '../../cli/protocol.j
 import { normalizeEngineName, resolveRequestedEngines, SupportedSearchEngine } from '../../core/search/searchEngines.js';
 import { validatePublicWebUrl } from '../../core/validation/targetValidation.js';
 import { isBrowserUnavailableError, shutdownLocalPlaywrightBrowserSessions } from '../../utils/playwrightClient.js';
+import { registerDeepSeekCompatRoutes } from './deepseekCompat.js';
 
 export type LocalDaemonOptions = {
     host?: string;
@@ -51,7 +52,8 @@ function getCapabilities(): string[] {
         'fetch-csdn',
         'fetch-juejin',
         'fetch-github-readme',
-        'fetch-linuxdo'
+        'fetch-linuxdo',
+        'deepseek-compat'
     ];
 }
 
@@ -69,7 +71,7 @@ function sendError(
     res.status(statusCode).json(createErrorEnvelope(code, message, options));
 }
 
-function parseRequestedEngines(runtime: OpenWebSearchRuntime, engines: unknown): SupportedSearchEngine[] {
+export function parseRequestedEngines(runtime: OpenWebSearchRuntime, engines: unknown): SupportedSearchEngine[] {
     if (engines === undefined) {
         return [runtime.config.defaultSearchEngine as SupportedSearchEngine];
     }
@@ -125,7 +127,7 @@ function parseUrl(url: unknown): string {
     return url.trim();
 }
 
-function parseMaxChars(maxChars: unknown): number {
+export function parseMaxChars(maxChars: unknown): number {
     if (maxChars === undefined) {
         return 30000;
     }
@@ -372,6 +374,8 @@ export async function startLocalDaemon(
             });
         }
     });
+
+    registerDeepSeekCompatRoutes(app, runtime);
 
     const server = await new Promise<http.Server>((resolve, reject) => {
         const startedServer = app.listen(requestedPort, host, () => resolve(startedServer));
