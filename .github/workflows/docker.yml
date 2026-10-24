@@ -13,6 +13,12 @@ on:
         required: true
         type: string
 
+# Explicit least-privilege grants: forks default to a read-only GITHUB_TOKEN,
+# which makes the GHCR push step fail with "denied: ... Create ... package"
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
